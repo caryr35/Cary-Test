@@ -33,7 +33,7 @@ jobs:
       - name: Update Grafana dashboard
         uses: grafana/grafana-update-dashboard-action@v1.4.0
         with:
-          grafana_url: https//your-grafana-url
+          grafana_url: https//caryr35@grafana.net
           grafana-api_key: ${{ secrets.GRAFANA_API_Key }}
           dashboard_name: RAPIDS Release Monitoring 
           dashboard_file: output.json
