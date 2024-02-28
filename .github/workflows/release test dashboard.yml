@@ -1,0 +1,39 @@
+name: Release Monitoring Dashboard
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  update_dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          pip install request jsonschema
+
+      - name: Get recent pull requests
+        id: pull requests
+        run: |
+          # Use GitHub API to fetch merged pull requests
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              https://api.github.com/repos/${{ github.reposisotry }}/pulls?state=closed&merged=true > pull_requests.json
+
+      - name: Get CI build status
+        id: build status
+        run: |
+          # Use CI Platform API (replace with your specific API call)
+          curl -H X GET https://ci.example.com/api/builds/latest > build_status
+
+      - name: Process data and format for Grafana
+        run: |
+          python process_data.py pull_requests.json bulid_status.json output.json
+
+      - name: Update Grafana dashboard
+        uses: grafana/grafana-update-dashboard-action@v1.4.0
+        with:
+          grafana_url: https//your-grafana-url
+          grafana-api_key: ${{ secrets.GRAFANA_API_Key }}
+          dashboard_name: RAPIDS Release Monitoring 
+          dashboard_file: output.json
